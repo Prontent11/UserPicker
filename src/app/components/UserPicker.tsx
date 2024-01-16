@@ -1,7 +1,8 @@
 "use client";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import UserItem from "./UserItem";
 import UserSuggestions from "./UserSuggestions";
+import UserItem from "./UserItem";
 
 type UserList = {
   name: string;
@@ -18,39 +19,42 @@ const Users: UserList[] = [
   { name: "yash6", email: "yash6@gmail.com" },
   { name: "yash7", email: "yash7@gmail.com" },
   { name: "yash8", email: "yash8@gmail.com" },
-]; // Your user data
+];
 
-const UserPicker: React.FC = () => {
+const UserPicker = () => {
   const [userList, setUserList] = useState<UserList[]>(Users);
-  const [displayList, setDisplayList] = useState<UserList[] | null>(null);
+  const [displayList, setDisplayList] = useState<UserList[]>();
   const [inputText, setInputText] = useState<string>("");
   const [userName, setUserName] = useState<UserList[]>();
-  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-
+  const [showSuggestions, setShowSuggestions] = useState<Boolean>(false);
   const removeUser = (email: string | undefined) => {
-    const newDisplayList = displayList?.filter((user) => user.email !== email);
+    const newDisplayList = displayList?.filter((user) => {
+      if (user.email !== email) {
+        return user;
+      }
+    });
     setDisplayList(newDisplayList!);
   };
-
   const addUser = (email: string | undefined) => {
-    const displayUser = userList.find((user) => user.email === email);
+    const displayUser = userList.find((user) => {
+      return user.email == email;
+    });
     const inputName: string = displayUser!.name;
     localStorage.setItem("inputName", inputName);
+    console.log("display:user", displayUser);
     if (displayUser)
       setDisplayList((prevDisplayList) =>
         prevDisplayList ? [...prevDisplayList, displayUser] : [displayUser]
       );
   };
-
   useEffect(() => {
     console.log("displayList", displayList);
   }, [displayList]);
-
   useEffect(() => {
-    console.log("entered input text change");
-    const newUserNames: UserList[] = userList.filter((user) =>
-      user.name.startsWith(inputText!)
-    );
+    console.log("enterend inputext change");
+    const newUserNames: UserList[] = userList.filter((user) => {
+      return user.name.startsWith(inputText!);
+    });
     console.log("newusernames", newUserNames);
     setUserName(newUserNames);
   }, [inputText]);
@@ -71,11 +75,11 @@ const UserPicker: React.FC = () => {
 
   return (
     <div className="flex h-screen w-full justify-center flex-col items-center text-black bg-white ">
-      <span className="text-purple-400 text-4xl mb-5">Pick User</span>
-      <div className="grid grid-flow-row md:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 h-min-[300px] gap-5 w-min-[400px] border-purple-500 border-solid border-b-2 pb-2">
-        {displayList?.map((user, index) => (
-          <UserItem key={index} user={user} onRemove={removeUser} />
-        ))}
+      <span className="text-purple-400  text-4xl mb-5">Pick User</span>
+      <div className="grid grid-flow-row md:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 h-min-[300px] gap-5  w-min-[400px] border-purple-500 border-solid border-b-2 pb-2">
+        {displayList?.map((user, index) => {
+          return <UserItem user={user} onRemove={removeUser} />;
+        })}
         <div>
           <div className="flex ">
             <input
@@ -88,9 +92,13 @@ const UserPicker: React.FC = () => {
               placeholder="Add User Name"
             />
           </div>
-          <div className="">
+          <div className="absolute mt-3 w-min-0 text-left   max-h-[200px] overflow-y-auto shadow-lg">
             {showSuggestions && (
-              <UserSuggestions users={userName || []} onAdd={addUser} />
+              <UserSuggestions
+                displayList={displayList}
+                users={userName}
+                onAdd={addUser}
+              />
             )}
           </div>
         </div>
@@ -100,3 +108,35 @@ const UserPicker: React.FC = () => {
 };
 
 export default UserPicker;
+/*<div
+              key={index}
+              className="bg-[#f2f2f1] px-3 py-2 flex justify-between rounded-2xl min-w-0"
+            >
+              <div className="flex gap-2 items-center">
+                <Image
+                  src={`https://robohash.org/${user.email}?set=set1`}
+                  width={30}
+                  height={30}
+                  alt="profile"
+                  className="object-fill"
+                />
+                {user.name}{" "}
+              </div>
+
+              <button onClick={() => removeUser(user.email)}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>* */

@@ -11,7 +11,7 @@ type UserItemProps = {
 };
 
 const UserItem: React.FC<UserItemProps> = ({ user, onRemove }) => (
-  <div className="bg-[#f2f2f1] px-3 py-2 flex justify-between rounded-2xl min-w-0">
+  <div className="bg-[#f2f2f1] px-3 py-2  flex justify-between rounded-2xl min-w-0">
     <div className="flex gap-2 items-center">
       <Image
         src={`https://robohash.org/${user.email}?set=set1`}
