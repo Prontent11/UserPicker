@@ -35,15 +35,22 @@ const UserPicker = () => {
     });
     setDisplayList(newDisplayList!);
   };
+  const checkDisplayList = (email: string) => {
+    const displayUser = userList.find((user) => {
+      return user.email == email;
+    });
+    const check = displayList?.includes(displayUser!) || false;
+    return check;
+  };
   const addUser = (email: string | undefined) => {
     const displayUser = userList.find((user) => {
       return user.email == email;
     });
     const inputEmail: string | undefined = displayUser!.email;
-    localStorage.setItem("inputEmail", inputEmail!);
+    localStorage.setItem("user", JSON.stringify(displayUser));
     console.log("display:user", displayUser);
     if (displayUser)
-      if (!displayList?.includes(displayUser)) {
+      if (!checkDisplayList(displayUser.email!)) {
         setDisplayList((prevDisplayList) =>
           prevDisplayList ? [...prevDisplayList, displayUser] : [displayUser]
         );
@@ -61,19 +68,22 @@ const UserPicker = () => {
     setUserName(newUserNames);
   }, [inputText]);
 
+  useEffect(() => {
+    setUserList(Users);
+  }, []);
+
   const handleBackSpace = (event: any) => {
     console.log("backspace hit", event.key);
     const key = event.key;
-    if (
-      key === "Backspace" &&
-      !inputText &&
-      localStorage.getItem("inputEmail")
-    ) {
-      console.log(localStorage.getItem("inputEmail"));
 
-      addUser(localStorage.getItem("inputEmail")!);
-    } else if (key === "Backspace" && localStorage.getItem("inputEmail")) {
-      removeUser(localStorage.getItem("inputEmail")!);
+    if (key === "Backspace" && !inputText && localStorage.getItem("user")) {
+      const user = JSON.parse(localStorage.getItem("user")!);
+
+      if (checkDisplayList(user.email)) {
+        removeUser(user.email);
+      } else {
+        addUser(user.email);
+      }
     }
   };
 
