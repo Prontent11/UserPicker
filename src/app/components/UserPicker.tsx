@@ -39,13 +39,15 @@ const UserPicker = () => {
     const displayUser = userList.find((user) => {
       return user.email == email;
     });
-    const inputName: string = displayUser!.name;
-    localStorage.setItem("inputName", inputName);
+    const inputEmail: string | undefined = displayUser!.email;
+    localStorage.setItem("inputEmail", inputEmail!);
     console.log("display:user", displayUser);
     if (displayUser)
-      setDisplayList((prevDisplayList) =>
-        prevDisplayList ? [...prevDisplayList, displayUser] : [displayUser]
-      );
+      if (!displayList?.includes(displayUser)) {
+        setDisplayList((prevDisplayList) =>
+          prevDisplayList ? [...prevDisplayList, displayUser] : [displayUser]
+        );
+      }
   };
   useEffect(() => {
     console.log("displayList", displayList);
@@ -65,11 +67,13 @@ const UserPicker = () => {
     if (
       key === "Backspace" &&
       !inputText &&
-      localStorage.getItem("inputName")
+      localStorage.getItem("inputEmail")
     ) {
-      setInputText(localStorage.getItem("inputName")! + " ");
-    } else if (key === "Backspace" && localStorage.getItem("inputName")) {
-      setInputText("");
+      console.log(localStorage.getItem("inputEmail"));
+
+      addUser(localStorage.getItem("inputEmail")!);
+    } else if (key === "Backspace" && localStorage.getItem("inputEmail")) {
+      removeUser(localStorage.getItem("inputEmail")!);
     }
   };
 
@@ -78,7 +82,9 @@ const UserPicker = () => {
       <span className="text-purple-400  text-4xl mb-5">Pick User</span>
       <div className="grid grid-flow-row md:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 h-min-[300px] gap-5  w-min-[400px] border-purple-500 border-solid border-b-2 pb-2">
         {displayList?.map((user, index) => {
-          return <UserItem user={user} onRemove={removeUser} />;
+          return (
+            <UserItem key={user.email} user={user} onRemove={removeUser} />
+          );
         })}
         <div>
           <div className="flex ">
